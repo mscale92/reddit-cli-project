@@ -1,0 +1,31 @@
+{
+  "name": "reddit-cml",
+  "version": "1.0.0",
+  "description": "Reddit command line",
+  "main": "index.js",
+  "dependencies": {
+    "colors": "^1.1.2",
+    "compute-size": "^1.0.5",
+    "image-to-ascii": "^3.0.5",
+    "inquirer": "^1.2.2",
+    "prompt": "^1.0.0",
+    "request": "^2.75.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mscale92/reddit-cli-project.git"
+  },
+  "keywords": [
+    "reddit"
+  ],
+  "author": "Mary Scale",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/mscale92/reddit-cli-project/issues"
+  },
+  "homepage": "https://github.com/mscale92/reddit-cli-project#readme"
+}

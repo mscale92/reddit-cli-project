@@ -2,11 +2,13 @@
 
 var request = require("request");
 
-/*
-This function should "return" the default homepage posts as an array of objects
-*/
-//Don't use new Promise everywhere
-//just put it in a function and call that
+var start = require("./inquirerTest.js");
+
+start.homeMenu();
+//when reddit.js is run, the inquirer function, homeMenu
+    //from the inquirerTest.js is run
+    //thus giving the user menu choices
+
 
 function getPromise(url){
     return(
@@ -18,16 +20,17 @@ function getPromise(url){
                 else{
                     resolve(result);
                 }
-            })
+            });
         })
-    )
+    );
 }
 //end of getPromise function
     //this function makes a new promise for us so that 
     //we don't have to keep making new promises all over the place
 
 
-function getHomepage(url) {
+function getHomepage(directories) {
+    var url = "https://www.reddit.com/" + directories;
   // Load reddit.com/.json and call back with the array of posts
   return (
       getPromise(url + ".json")
@@ -43,8 +46,8 @@ function getHomepage(url) {
         //Remember DRY ;)
 
 
-function getSortedHomepage(url, sortingMethod) {
-    return getHomepage(url + sortingMethod)
+function getSortedHomepage(sortingMethod) {
+    return getHomepage(sortingMethod)
     .then(function(sortingResult){
         // console.log(sortingResult);
         return sortingResult;
@@ -56,8 +59,9 @@ function getSortedHomepage(url, sortingMethod) {
     //controversial, top, gilded, and promoted.
     
     
-function getSubreddit(url, subreddit){
-    return getHomepage(url + "r/" + subreddit)
+function getSubreddit(subreddit){
+
+    return getHomepage("r/" + subreddit)
     //adding r/ so that we can access the subreddit data
         //using our getHomepage promise function
     .then(function(subredditResult){
@@ -67,8 +71,8 @@ function getSubreddit(url, subreddit){
 //end of getSubreddit promise function
 
 
-function getSortedSubreddit(url, subreddit, sortingMethod){
-    return getHomepage(url + "r/" + subreddit + "/" + sortingMethod)
+function getSortedSubreddit(subreddit, sortingMethod){
+    return getHomepage("r/" + subreddit + "/" + sortingMethod)
     //don't forget the "/"
         //urls need them to separated directories
     .then(function(sortedSubResults){
@@ -78,8 +82,8 @@ function getSortedSubreddit(url, subreddit, sortingMethod){
 //end of getSortedSubreddit promise function
 
 
-function getSubreddits(url){
-    return getHomepage(url + "subreddits")
+function getSubreddits(){
+    return getHomepage("subreddits")
     .then(function(subsResults){
         return subsResults;
     });
