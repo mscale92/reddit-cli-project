@@ -2,9 +2,9 @@
 
 var request = require("request");
 
-var start = require("./inquirerTest.js");
+var start = require("./inquirerReddit.js");
 
-start.homeMenu();
+// start.homeMenu();
 //when reddit.js is run, the inquirer function, homeMenu
     //from the inquirerTest.js is run
     //thus giving the user menu choices
