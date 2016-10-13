@@ -1,10 +1,9 @@
 //mod for reddit functions
 
 var request = require("request");
+require("./inquirerReddit.js");
 
-var start = require("./inquirerReddit.js");
 
-// start.homeMenu();
 //when reddit.js is run, the inquirer function, homeMenu
     //from the inquirerTest.js is run
     //thus giving the user menu choices
