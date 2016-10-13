@@ -5,17 +5,20 @@ var reddit = require("./reddit.js");
     //reddit.sortedSubreddit to get the sortedSubreddit function
     //reddit.subreddits to get the subreddits function
     
-var url = "https://www.reddit.com/";
-//use the global url variable to easily access reddit apis without
-    //hassle
 
-reddit.subreddits(url)
+    
+reddit.homepage("")
 .then(function(results){
-    console.log(results[0]);
+    console.log(results);
 })
-.catch(function(err){
-    console.log("Oh no!" + err);
-});
+
+// reddit.subreddits()
+// .then(function(results){
+//     console.log(results[0]);
+// })
+// .catch(function(err){
+//     console.log("Oh no!" + err);
+// });
 
     //testing subreddits mod
 
