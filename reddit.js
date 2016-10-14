@@ -44,7 +44,8 @@ function getHomepage(directories) {
     //JSON parses the data for us
         //Remember DRY ;)
 
-//function used to get post information from the homepage
+
+//function used to fetch post information from the homepage
 function getHomepagePosts(directories) {
     var url = "https://www.reddit.com/" + directories;
   // Load reddit.com/.json and call back with the array of posts
@@ -58,6 +59,7 @@ function getHomepagePosts(directories) {
       })
     )
 }
+//end of getHomepagePosts
 
 function getSortedHomepage(sortingMethod) {
     return getHomepage(sortingMethod)
