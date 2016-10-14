@@ -7,6 +7,7 @@ var redditFuncs = require('./reddit.js');
 require("colors");
 const imageToAscii = require("image-to-ascii");
 const computeSize = require("compute-size");
+var wrap = require('word-wrap');
 
 //start of various menu arrays with object choices
 var mainMenu = [
@@ -85,14 +86,116 @@ function imagesAscii(imagesURL, post){
 //imagesAscii function,
     //converts images to ascii
 
+function indentString(string, tab){
+    console.log(wrap(string,{
+        width: 30,
+        indent: tab,
+        
+        }
+    ));
+}
+
+
+
+
+function findingReplies(childrenArray, tab){
+    
+        //adding some space
+    return childrenArray.forEach(function(comment){
+        if(comment.data.body){
+            //if a comment exists
+            
+            indentString(comment.data.author.bold.magenta, tab);
+            indentString(comment.data.body.grey, tab);
+            // console.log(comment.data.author.bold.magenta);
+            // console.log(comment.data.body.grey);
+//HERES!
+                //print the comment, body, and the author
+            if(comment.data.replies){
+                tab = tab + "     ";
+                var repliesArray = comment.data.replies.data.children;
+                findingReplies(repliesArray, tab);
+                //recursively use this function again
+                    //add the new tab value so that the nested subcomments
+                    //are properly indented
+                //by using recursion we are able to go
+                    //into the subcomments which are found
+                    //under the replies path
+                //We have no idea how many there are so
+                    //we must keep going and only stop if a comment
+                    //comment.data.body is missing
+                tab = "";
+                //Then we reset our tab indent amount 
+                
+                return;
+                //return so that this is finished
+            }
+            else{
+                console.log("    ");
+                //add some space between comments
+                tab = "";
+                //reset the tab so that original comments
+                    //just comment.data.replies
+                    //are not indented as subcomments
+                return;
+            }
+        
+        }
+        else{
+            return;
+        }
+    })
+}
+//end of findingReplies function
+ //children[1] contains all of the comments and replies
+    //these comments are stored as children[x].data.body
+    //if a comment has been replied to then it appears as
+        //children[x].data.replies.data.children[x].data.body
+
+
+function postSelector(postList){
+    return promptUserChoices(postList, "list", "Pick a Post")
+   .then(function(postName){
+        //postName is the name of the object returned from the
+            //user
+        if(postName.menu === "Main Menu"){
+            //postName.menu takes the key, menu, and uses it
+            //to extract the value which is the permalink, or link, of the post
+            return homeMenu();
+            //if main menu is selected, we go back to the main menu
+        }
+        else{
+            return redditFuncs.fetchposts(postName.menu)
+            //use homepage function, since the permalink begins with \r already
+                //fetchposts uses the getHomepagePosts function in reddit.js
+            .then(function(wholeArray){
+                var headerAndComments = [wholeArray[0].data.children[0],
+                                        wholeArray[1].data.children];
+                
+                
+                return headerAndComments;
+                //this is where the title, author, permalink, and images live
+                    //0 is the original poster info as an object
+                    //1 holds all the comments as the children array
+            })
+        }
+   })
+   .then(function(headerAndComments){
+       //time to extract our header and comments
+       extract(headerAndComments);
+   })
+}
+
+
+
 
 function postTemplate(post){
     console.log("\n");
     console.log(post.data.title.bold.green);
     console.log("Created by " + post.data.author);
-    console.log(("https://www.reddit.com" + post.data.url).cyan);
+    console.log(("https://www.reddit.com" + post.data.permalink).cyan);
     console.log("\n");
-    homeMenu();
+    
 }
 //Template, stylizing of the posts
     //when a post is displayed, this is how, and what
@@ -100,7 +203,8 @@ function postTemplate(post){
 //always runs the homeMenu function at the end so that users can
     //access other pages
     
-function displayPosts(post){
+function displayPosts(headersCommentsArray){
+    var post = headersCommentsArray[0];
     if(post.data.preview){
         //
         var imagesURL = post.data.thumbnail;
@@ -109,6 +213,12 @@ function displayPosts(post){
             postTemplate(post);
             //post Template styles the posts and selects the data
             //that will be used
+            var tab = "";
+            findingReplies(headersCommentsArray[1], tab);
+                //use our recursive function finding replies for
+                    //our array of comment information
+                    //this is stored at headersCommentsArray[1]
+            homeMenu();
         })
         .catch(function(err){
             console.log(err);
@@ -116,7 +226,12 @@ function displayPosts(post){
     }
     else{
         postTemplate(post);
-        
+        var tab = "";
+            findingReplies(headersCommentsArray[1], tab);
+                //use our recursive function finding replies for
+                    //our array of comment information
+                    //this is stored at headersCommentsArray[1]
+        homeMenu();
     }
 };
 //this function displays the post titles and their links, and images
@@ -126,13 +241,13 @@ function displayPosts(post){
         //images are converted using the imagesAscii function above
 
 
-function extract(childrenArray){
-    childrenArray.forEach(displayPosts);
-    //use a forEach to go through each object
-        //in the children array in order to access
-        //individual posts
-    //displayPosts works for homepage posts,
-        //subreddits don't have permalinks
+function extract(headersCommentsArray){
+    displayPosts(headersCommentsArray);
+        //headersCommentsArray[0] is our header object
+            //this contains the permalink, author name of the original post,
+            //any images, and the name of the post
+    
+    
 }
 //Extract data from childrenArray and then display the Posts
     //does not work for Subreddits
@@ -160,7 +275,7 @@ function postSelectorExtractMenu(childrenArray){
 }
 
 //Creates a menu of posts that can be selected with the console
-function postSelector(postList){
+function postSelectorC(postList){
     return promptUserChoices(postList, "list", "Pick a Post")
    .then(function(postName){
         //postName is the name of the object returned from the
@@ -175,6 +290,10 @@ function postSelector(postList){
             return redditFuncs.fetchposts(postName.menu)
             //use homepage function, since the permalink begins with \r already
                 //fetchposts uses the getHomepagePosts function in reddit.js
+            .then(function(wholeArray){
+                return wholeArray[0].data.children;
+                //this is where the title, author, permalink, and images live
+            })
             .then(function(postChildrenArray){
                 return extract(postChildrenArray);
                 //user the extract function to remove data from the

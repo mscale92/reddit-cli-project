@@ -55,7 +55,7 @@ function getHomepagePosts(directories) {
         //   console.log(JSON.parse(homepageResult.body).data);
           var array = JSON.parse(postResult.body);
           
-          return array[0].data.children;
+          return array;
       })
     )
 }
