@@ -59,6 +59,7 @@ function promptUserInput(message, automatic){
     //that the user enters
 
 function displayPosts(post){
+    console.log("\n");
     console.log(post.data.title.bold.green);
     console.log("Created by " + post.data.author);
     console.log(("https://www.reddit.com/" + post.data.permalink).cyan);
@@ -70,6 +71,7 @@ function displayPosts(post){
     //post links are blue
     
 function displaySubReddits(post){
+    console.log("\n");
     console.log(post.data.title.bold.green);
     console.log("Created by " + post.data.author);
     console.log(("https://www.reddit.com" + post.data.url).magenta);
@@ -87,6 +89,50 @@ function extract(childrenArray){
 //Extract data from childrenArray and then display the Posts
     //does not work for Subreddits
 
+//Extracts data for posts to be selected with the console
+function postSelectorExtract(childrenArray){
+    return childrenArray.map(function(posts){
+            //take each position, posts, in the children array of data
+            return{
+            name: posts.data.title,
+            value: posts.data.permalink
+            }
+    })
+}
+
+//Creates a menu of posts that can be selected with the console
+function postSelector(postList){
+    return promptUserChoices(postList, "list", "Pick a Post")
+   .then(function(postName){
+        //postName is the name of the object returned from the
+            //user
+        if(postName.menu === "Main Menu"){
+            //postName.menu takes the key, menu, and uses it
+            //to extract the value which is the permalink, or link, of the post
+            return homeMenu();
+            //if main menu is selected, we go back to the main menu
+        }
+        else{
+            var directory = postName.menu.replace("/r", "r");
+            
+            return redditFuncs.fetchposts(directory)
+            //use homepage function, since the permalink begins with \r already
+                //though use replace to get rid of the \ before the r
+            .then(function(postChildrenArray){
+                return extract(postChildrenArray);
+            })
+            .catch(function(err){
+                console.log("there was an error" + err);
+            });
+        }
+                    
+    
+    })
+        //STOPPING POINT
+            //extract posts in menu format so that you can 
+            //select posts with the console
+}
+
 function homepageChoice(){
     return redditFuncs.homepage("")
     //use our homepage function to get the homepage data
@@ -95,7 +141,16 @@ function homepageChoice(){
         //takes directory strings in order to
         //modify the url
     .then(function(homepageChildrenArray){
-        return extract(homepageChildrenArray);
+        return postSelectorExtract(homepageChildrenArray);
+    })
+    .then(function(postList){
+        postList.push(new inquirer.Separator());
+        postList.push({name: "Main Menu", value: "Main Menu"});
+        postList.push(new inquirer.Separator());
+        return postList;
+    })
+    .then(function(postList){
+        return postSelector(postList);
     })
     .catch(function(error){
         console.log(error);
@@ -129,6 +184,10 @@ function subRedsChoice(){
             name: subReds.data.display_name,
             value: subReds.data.display_name
             }
+            //returns an object for each array position containing
+                //the display name as the key and the value
+                //this format is used for the choices parameter
+                //in the inquire prompt
         });
         //end of map function extraction
             //display names and links from subreddits

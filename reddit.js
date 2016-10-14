@@ -44,6 +44,20 @@ function getHomepage(directories) {
     //JSON parses the data for us
         //Remember DRY ;)
 
+//function used to get post information from the homepage
+function getHomepagePosts(directories) {
+    var url = "https://www.reddit.com/" + directories;
+  // Load reddit.com/.json and call back with the array of posts
+  return (
+      getPromise(url + ".json")
+      .then(function(postResult){
+        //   console.log(JSON.parse(homepageResult.body).data);
+          var array = JSON.parse(postResult.body);
+          
+          return array[0].data.children;
+      })
+    )
+}
 
 function getSortedHomepage(sortingMethod) {
     return getHomepage(sortingMethod)
@@ -109,7 +123,7 @@ module.exports.subreddits = getSubreddits;
     //this is different from the getSubreddit function
     //subreddits is a special directory in and of itself
     //access with .subreddits
-
+module.exports.fetchposts = getHomepagePosts;
 //exporting the functions as mods
     //NOTE
         //the functions don't have ()
